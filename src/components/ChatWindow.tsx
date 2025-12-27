@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { getSocket } from '@/lib/socket-client'
 import { voiceManager } from '@/lib/voice-manager'
+import AddMemberModal from './AddMemberModal'
 import styles from './ChatWindow.module.css'
 
 interface ChatWindowProps {
@@ -17,6 +18,7 @@ export default function ChatWindow({ user, selectedChat, chatType }: ChatWindowP
     const [isTyping, setIsTyping] = useState(false)
     const [inVoiceCall, setInVoiceCall] = useState(false)
     const [isMuted, setIsMuted] = useState(false)
+    const [showAddMember, setShowAddMember] = useState(false)
     const messagesEndRef = useRef<HTMLDivElement>(null)
     const typingTimeoutRef = useRef<any>(null)
 
@@ -233,6 +235,23 @@ export default function ChatWindow({ user, selectedChat, chatType }: ChatWindowP
                         </button>
                     </div>
                 )}
+
+                {chatType === 'group' && (
+                    <div className={styles.voiceControls}>
+                        <button
+                            className="btn-icon"
+                            onClick={() => setShowAddMember(true)}
+                            title="Add Members"
+                        >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                <circle cx="8.5" cy="7" r="4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                <line x1="20" y1="8" x2="20" y2="14" strokeWidth="2" strokeLinecap="round" />
+                                <line x1="23" y1="11" x2="17" y2="11" strokeWidth="2" strokeLinecap="round" />
+                            </svg>
+                        </button>
+                    </div>
+                )}
             </div>
 
             <div className={styles.messages}>
@@ -288,6 +307,17 @@ export default function ChatWindow({ user, selectedChat, chatType }: ChatWindowP
                     </svg>
                 </button>
             </div>
+
+            {showAddMember && chatType === 'group' && (
+                <AddMemberModal
+                    groupId={selectedChat.id}
+                    onClose={() => setShowAddMember(false)}
+                    onMemberAdded={() => {
+                        // Optionally refresh group data or show success message
+                        setShowAddMember(false)
+                    }}
+                />
+            )}
         </div>
     )
 }
